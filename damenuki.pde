@@ -12,7 +12,7 @@ int select;
 int current = 0;
 
 color baseColor=color(255*2/3),useColor=color(255/3), notUseColor=color(255*2/3), startColor=color(0, 0, 0);
-int imgWidth=1320, imgHeight=880, menuHeight=150, buf = 200;
+int imgWidth=1320, imgHeight=880, menuHeight=150, buf = 350;
 int rightColor=0, leftColor=0;
 
 void setup() {
@@ -186,6 +186,8 @@ void makeUI() {
   }
   if (filePath!=null && usePath!=null && notUsePath!=null) {
     fill(255);
+    PImage ope = loadImage("operation.png");
+    image(ope,imgWidth,menuHeight*4+30,buf,ope.height*buf/ope.width);
   } else {
     fill(128);
   }
