@@ -2,7 +2,7 @@ import java.io.*;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
-boolean activate=false;
+boolean activate=false, start=true;
 String filePath, usePath, notUsePath;
 String[] fileArray;
 HashMap<String, Pic> img = new HashMap<String, Pic>();
@@ -11,7 +11,7 @@ File directory;
 int select;
 int current = 0;
 
-color baseColor=color(255*2/3),useColor=color(255/3), notUseColor=color(255*2/3), startColor=color(0, 0, 0);
+color baseColor=color(255*2/3), useColor=color(255/3), notUseColor=color(255*2/3), startColor=color(0, 0, 0);
 int imgWidth=1320, imgHeight=880, menuHeight=150, buf = 350;
 int rightColor=0, leftColor=0;
 
@@ -30,6 +30,22 @@ void draw() {
     while (!img.containsKey (fileArray[current])) {
       current++;
     }
+    println("dir : "+img.get(fileArray[current]).dir);
+    println("    : "+filePath+fileArray[current]);
+    /*
+    if (img.get(fileArray[current]).dir.getAbsolutePath().equals(filePath+fileArray[current])) {
+     fill(255, 0, 0);
+     text("ダメ抜き元フォルダ", imgWidth+buf/2, menuHeight/4);
+     }
+     if (img.get(fileArray[current]).dir.equals(usePath+fileArray[current])) {
+     fill(255, 0, 0);
+     text("使用画像用フォルダ", imgWidth+buf/2, menuHeight/4);
+     }
+     if (img.get(fileArray[current]).dir.equals(notUsePath+fileArray[current])) {
+     fill(255, 0, 0);
+     text("不使用画像用フォルダ", imgWidth+buf/2, menuHeight/4);
+     }
+     */
     image(img.get(fileArray[current]).pic, 0, 0, imgWidth, imgHeight);
   }
 
@@ -68,6 +84,7 @@ void keyPressed() {
     img.put(fileArray[current], _img);
     leftColor=255;
   }
+  makeUI();
 }
 
 void mousePressed() {
@@ -85,11 +102,13 @@ void mousePressed() {
       selectFolder("Select a file to process:", "fileSelected");
     }
     if (mouseY>menuHeight*3 && mouseY<menuHeight*4) {
-      if (filePath!=null && usePath!=null && notUsePath!=null) {
+      if (filePath!=null && usePath!=null && notUsePath!=null && start) {
+        start=false;
         directory = new File(filePath);
         fileArray = directory.list();
         if (fileArray != null) {
           loadImg();
+          makeUI();
         } else {
           System.out.println(directory.toString() + "　は存在しません" );
           exit();
@@ -138,15 +157,16 @@ void fileSelected(File selection) {
   redraw();
 }
 void makeUI() {
-  background(255);
-  fill(0);
-  
-  String guide="";
-  if(filePath==null)guide+="ダメ抜き元フォルダ ";
-  if(usePath==null)guide+="使用画像用フォルダ ";
-  if(notUsePath==null)guide+="不使用画像用フォルダ ";
-  if(guide!="")text(guide + "を選択してください",imgWidth/2,imgHeight/2);
-  
+  if (!activate) {
+    background(255);
+    fill(0);
+
+    String guide="";
+    if (filePath==null)guide+="ダメ抜き元フォルダ ";
+    if (usePath==null)guide+="使用画像用フォルダ ";
+    if (notUsePath==null)guide+="不使用画像用フォルダ ";
+    if (guide!="")text(guide + "を準備し、選択してください", imgWidth/2, imgHeight/2);
+  }
   fill(baseColor);
   rect(imgWidth, 0, buf, menuHeight);
   fill(useColor);
@@ -156,8 +176,9 @@ void makeUI() {
   fill(startColor);
   rect(imgWidth, menuHeight*3, buf, menuHeight);
   fill(255);
-  
-  text("ダメ抜き元フォルダ", imgWidth+buf/2, menuHeight/4);
+
+
+  fill(255);
   if (filePath==null) {
     text("選択...", imgWidth+buf/2, menuHeight/2);
   } else {
@@ -165,8 +186,13 @@ void makeUI() {
     text(filePath, imgWidth, menuHeight/3, buf-10, menuHeight/2);
     textSize(20);
     text("修正...", imgWidth+buf/2, menuHeight*5/6);
+    if (activate && img.get(fileArray[current]).dir.getAbsolutePath().equals(filePath+fileArray[current])) {
+      fill(#c93a40);
+    }
   }
-  text("使用画像用フォルダ", imgWidth+buf/2, menuHeight+menuHeight/4);
+  text("ダメ抜き元フォルダ", imgWidth+buf/2, menuHeight/4);
+  fill(255);
+
   if (usePath==null) {
     text("選択...", imgWidth+buf/2, menuHeight+menuHeight/2);
   } else {
@@ -174,8 +200,12 @@ void makeUI() {
     text(usePath, imgWidth, menuHeight+menuHeight/3, buf-10, menuHeight+menuHeight/2);
     textSize(20);
     text("修正...", imgWidth+buf/2, menuHeight+menuHeight*5/6);
+    if (activate && img.get(fileArray[current]).dir.getAbsolutePath().equals(usePath+fileArray[current])) {
+      fill(#d685b0);
+    }
   }
-  text("不使用画像用フォルダ", imgWidth+buf/2, menuHeight*2+menuHeight/4);
+  text("使用画像用フォルダ", imgWidth+buf/2, menuHeight+menuHeight/4);
+  fill(255);
   if (notUsePath==null) {
     text("選択...", imgWidth+buf/2, menuHeight*2+menuHeight/2);
   } else {
@@ -183,11 +213,20 @@ void makeUI() {
     text(notUsePath, imgWidth, menuHeight*2+menuHeight/3, buf-10, menuHeight*2+menuHeight/2);
     textSize(20);
     text("修正...", imgWidth+buf/2, menuHeight*2+menuHeight*5/6);
+    if (activate && img.get(fileArray[current]).dir.getAbsolutePath().equals(notUsePath+fileArray[current])) {
+      fill(#c93a40);
+    }
   }
+  text("不使用画像用フォルダ", imgWidth+buf/2, menuHeight*2+menuHeight/4);
+  fill(255);
   if (filePath!=null && usePath!=null && notUsePath!=null) {
-    fill(255);
+    if (start) {
+      fill(255);
+    } else {
+      fill(128);
+    }
     PImage ope = loadImage("operation.png");
-    image(ope,imgWidth,menuHeight*4+30,buf,ope.height*buf/ope.width);
+    image(ope, imgWidth, menuHeight*4+30, buf, ope.height*buf/ope.width);
   } else {
     fill(128);
   }
