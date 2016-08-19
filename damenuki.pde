@@ -30,25 +30,8 @@ void draw() {
     while (!img.containsKey (fileArray[current])) {
       current++;
     }
-    println("dir : "+img.get(fileArray[current]).dir);
-    println("    : "+filePath+fileArray[current]);
-    /*
-    if (img.get(fileArray[current]).dir.getAbsolutePath().equals(filePath+fileArray[current])) {
-     fill(255, 0, 0);
-     text("ダメ抜き元フォルダ", imgWidth+buf/2, menuHeight/4);
-     }
-     if (img.get(fileArray[current]).dir.equals(usePath+fileArray[current])) {
-     fill(255, 0, 0);
-     text("使用画像用フォルダ", imgWidth+buf/2, menuHeight/4);
-     }
-     if (img.get(fileArray[current]).dir.equals(notUsePath+fileArray[current])) {
-     fill(255, 0, 0);
-     text("不使用画像用フォルダ", imgWidth+buf/2, menuHeight/4);
-     }
-     */
     image(img.get(fileArray[current]).pic, 0, 0, imgWidth, imgHeight);
   }
-
 
   fill(0, leftColor);
   rect(0, height-50, imgWidth/2, 50);
